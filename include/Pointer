@@ -1,0 +1,121 @@
+#ifndef __POINTER__
+#include <iostream>
+
+template<typename T>
+class Pointer
+{
+    private:
+        T* ptr = nullptr;
+        bool isArray = false;
+        bool cascade = true;
+    public:
+        Pointer() {;}
+        Pointer(T* p, bool isArrayToggle = false, bool cascadeToggle = true) : ptr(p), isArray(isArrayToggle), cascade(cascadeToggle) {;}
+        Pointer(Pointer<T>& a, bool cascadeToggle = false) : ptr(a()), isArray(a.getIsArray()), cascade(cascadeToggle) {;}
+        Pointer(Pointer<T>&& a, bool cascadeToggle = false) : ptr(a()), isArray(a.getIsArray()), cascade(cascadeToggle) {;}
+        ~Pointer()
+        {
+            if(cascade)
+            {
+                if(isArray) delete[] ptr;
+                else delete ptr;
+            }
+        }
+        void free()
+        {
+            if(cascade)
+            {
+                if(isArray) delete[] ptr;
+                else delete ptr;
+            }
+            ptr = nullptr;
+            isArray = false;
+            cascade = true;
+        }
+        bool getIsArray() {return isArray;}
+        void setIsArray(bool isArrayToggle) {isArray = isArrayToggle;}
+        bool getCascade() {return cascade;}
+        void setCascade(bool cascadeToggle) {cascade = cascadeToggle;}
+        T* operator()() {return ptr;}
+        T& operator*() {return *ptr;}
+        void operator=(T* p)
+        {
+            if(ptr != p)
+            {
+                if(cascade)
+                {
+                    if(isArray) delete[] ptr;
+                    else delete ptr;
+                }
+                ptr = p;
+                isArray = false;
+            }
+        }
+        void operator=(Pointer<T>& a)
+        {
+            if(ptr != a())
+            {
+                if(cascade)
+                {
+                    if(isArray) delete[] ptr;
+                    else delete ptr;
+                }
+                ptr = a();
+                isArray = a.getIsArray();
+            }
+        }
+        void operator=(Pointer<T>&& a)
+        {
+            if(ptr != a())
+            {
+                if(cascade)
+                {
+                    if(isArray) delete[] ptr;
+                    else delete ptr;
+                }
+                ptr = a();
+                isArray = a.getIsArray();
+            }
+        }
+        T* operator->() {return ptr;}
+        T& operator[](int i) {return ptr[i];}
+        T* operator+(int i) {return ptr+i;}
+        T* operator-(int i) {return ptr-i;}
+        template<typename U> bool operator==(U* p) {Pointer<U> a(p, false, false); return ptr == a();}
+        template<typename U> bool operator==(Pointer<U>& a) {return ptr == a();}
+        template<typename U> bool operator==(Pointer<U>&& a) {return ptr == a();}
+        bool operator==(nullptr_t p) {return ptr == p;}
+        template<typename U> bool operator!=(U* p) {Pointer<U> a(p, false, false); return ptr != a();}
+        template<typename U> bool operator!=(Pointer<U>& a) {return ptr != a();}
+        template<typename U> bool operator!=(Pointer<U>&& a) {return ptr != a();}
+        bool operator!=(nullptr_t p) {return ptr != p;}
+        template<typename U> bool operator>(U* p) {Pointer<U> a(p, false, false); return ptr > a();}
+        template<typename U> bool operator>(Pointer<U>& a) {return ptr > a();}
+        template<typename U> bool operator>(Pointer<U>&& a) {return ptr > a();}
+        bool operator>(nullptr_t p) {return ptr > p;}
+        template<typename U> bool operator<(U* p) {Pointer<U> a(p, false, false); return ptr < a();}
+        template<typename U> bool operator<(Pointer<U>& a) {return ptr < a();}
+        template<typename U> bool operator<(Pointer<U>&& a) {return ptr < a();}
+        bool operator<(nullptr_t p) {return ptr < p;}
+        template<typename U> bool operator>=(U* p) {Pointer<U> a(p, false, false); return ptr >= a();}
+        template<typename U> bool operator>=(Pointer<U>& a) {return ptr >= a();}
+        template<typename U> bool operator>=(Pointer<U>&& a) {return ptr >= a();}
+        bool operator>=(nullptr_t p) {return ptr >= p;}
+        template<typename U> bool operator<=(U* p) {Pointer<U> a(p, false, false); return ptr <= a();}
+        template<typename U> bool operator<=(Pointer<U>& a) {return ptr <= a();}
+        template<typename U> bool operator<=(Pointer<U>&& a) {return ptr <= a();}
+        bool operator<=(nullptr_t p) {return ptr <= p;}
+        template<typename U> bool operator&&(U* p) {Pointer<U> a(p, false, false); return ptr && a();}
+        template<typename U> bool operator&&(Pointer<U>& a) {return ptr && a();}
+        template<typename U> bool operator&&(Pointer<U>&& a) {return ptr && a();}
+        bool operator&&(nullptr_t p) {return ptr && p;}
+        template<typename U> bool operator||(U* p) {Pointer<U> a(p, false, false); return ptr || a();}
+        template<typename U> bool operator||(Pointer<U>& a) {return ptr || a();}
+        template<typename U> bool operator||(Pointer<U>&& a) {return ptr || a();}
+        bool operator||(nullptr_t p) {return ptr || p;}
+        bool operator!() {return !ptr;}
+};
+
+template<typename T> std::ostream& operator<<(std::ostream& os, Pointer<T>& a) {std::cout << a(); return os;}
+
+#endif
